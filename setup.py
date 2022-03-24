@@ -70,7 +70,7 @@ Details can be found at `https://pysathq.github.io <https://pysathq.github.io>`_
 #==============================================================================
 to_install = ['cadical', 'gluecard30', 'gluecard41', 'glucose30', 'glucose41',
         'lingeling', 'maplechrono', 'maplecm', 'maplesat', 'mergesat3',
-        'minicard', 'minisat22', 'minisatgh']
+        'minicard', 'minisat22', 'minisatcs', 'minisatgh']
 
 # example scripts to install as standalone executables
 #==============================================================================

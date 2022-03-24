@@ -14,5 +14,6 @@ solvers/maplecm
 solvers/maplesat
 solvers/minicard
 solvers/minisat22
+solvers/minisatcs
 solvers/minisatgh
 

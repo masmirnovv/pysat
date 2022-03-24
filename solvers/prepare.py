@@ -77,6 +77,10 @@ sources = {
         'http://minisat.se/downloads/minisat-2.2.0.tar.gz',
         'solvers/minisat22.tar.gz'
     ),
+    'minisatcs': (
+        'https://github.com/jia-kai/minisatcs/archive/master.zip',
+        'solvers/minisatcs.zip'
+    ),
     'minisatgh': (
         'https://github.com/niklasso/minisat/archive/master.zip',
         'http://reason.di.fc.ul.pt/~aign/storage/mirror/minisatgh-master.zip',
@@ -99,6 +103,7 @@ to_extract = {
     'mergesat3': [],
     'minicard': [],
     'minisat22': [],
+    'minisatcs': [],
     'minisatgh': []
 }
 
@@ -261,6 +266,7 @@ to_move = {
         ('minicard', 'core')
     ],
     'minisat22': [],
+    'minisatcs': [],
     'minisatgh': [
         ('minisat/core', 'core'),
         ('minisat/mtl', 'mtl'),
@@ -491,6 +497,13 @@ to_remove = {
         'LICENSE',
         'README'
     ],
+    'minisatcs': [
+        'doc',
+        '.gitignore',
+        'LICENSE',
+        'README',
+        'README.md'
+    ],
     'minisatgh': [
         'core/Dimacs.h',
         'core/Main.cc',
@@ -504,6 +517,43 @@ to_remove = {
     ]
 }
 
+#
+#==============================================================================
+pre_make_cmds = {
+    'cadical': [],
+    'gluecard30': [],
+    'gluecard41': [],
+    'glucose30': [],
+    'glucose41': [],
+    'lingeling': [],
+    'maplechrono': [],
+    'maplecm': [],
+    'maplesat': [],
+    'mergesat3': [],
+    'minicard': [],
+    'minisat22': [],
+    'minisatcs': ['mkdir build', 'cd build', 'cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo'],
+    'minisatgh': []
+}
+
+#
+#==============================================================================
+post_make_cmds = {
+    'cadical': [],
+    'gluecard30': [],
+    'gluecard41': [],
+    'glucose30': [],
+    'glucose41': [],
+    'lingeling': [],
+    'maplechrono': [],
+    'maplecm': [],
+    'maplesat': [],
+    'mergesat3': [],
+    'minicard': [],
+    'minisat22': [],
+    'minisatcs': ['cd ..'],
+    'minisatgh': []
+}
 
 #
 #==============================================================================
@@ -666,4 +716,6 @@ def compile_solver(solver):
     """
 
     print('compiling {0}'.format(solver))
-    os.system('cd solvers/{0} && make && cd ../..'.format(solver))
+    pre_make = ' && '.join(pre_make_cmds[solver]) + ' &&' if pre_make_cmds[solver] else ''
+    post_make = ' && '.join(post_make_cmds[solver]) + ' &&' if post_make_cmds[solver] else ''
+    os.system('cd solvers/{0} && {1} make && {2} cd ../..'.format(solver, pre_make, post_make))

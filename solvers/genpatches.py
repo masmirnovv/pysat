@@ -22,7 +22,7 @@ import prepare
 # solvers to install
 #==============================================================================
 to_install = ['cadical', 'glucose30', 'glucose41', 'lingeling', 'maplechrono',
-        'maplecm', 'maplesat', 'minicard', 'minisat22', 'minisatgh']
+        'maplecm', 'maplesat', 'minicard', 'minisat22', 'minisatcs', 'minisatgh']
 
 
 #
