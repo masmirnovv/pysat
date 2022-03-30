@@ -201,6 +201,7 @@ class SolverNames(object):
             mergesat3   = ('mg3', 'mgs3', 'mergesat3', 'mergesat30')
             minicard    = ('mc', 'mcard', 'minicard')
             minisat22   = ('m22', 'msat22', 'minisat22')
+            minisatcs   = ('mcs', 'msat-cs', 'minisat-cs')
             minisatgh   = ('mgh', 'msat-gh', 'minisat-gh')
 
         As a result, in order to select Glucose3, a user can specify the
@@ -221,6 +222,7 @@ class SolverNames(object):
     mergesat3   = ('mg3', 'mgs3', 'mergesat3', 'mergesat30')
     minicard    = ('mc', 'mcard', 'minicard')
     minisat22   = ('m22', 'msat22', 'minisat22')
+    minisatcs   = ('mcs', 'msat-cs', 'minisat-cs')
     minisatgh   = ('mgh', 'msat-gh', 'minisat-gh')
 
 
@@ -386,6 +388,8 @@ class Solver(object):
                 self.solver = Minicard(bootstrap_with, use_timer)
             elif name_ in SolverNames.minisat22:
                 self.solver = Minisat22(bootstrap_with, use_timer)
+            elif name_ in SolverNames.minisatcs:
+                self.solver = MinisatCS(bootstrap_with, use_timer)
             elif name_ in SolverNames.minisatgh:
                 self.solver = MinisatGH(bootstrap_with, use_timer)
             else:
@@ -4781,6 +4785,144 @@ class Minisat22(object):
         """
 
         return False
+
+#
+#==============================================================================
+from pysat._utils import setup_pyx_import
+
+
+class MinisatCsImporter:
+    Solver = None
+
+    @classmethod
+    def get(cls):
+        if cls.Solver is None:
+            with setup_pyx_import():
+                from solvers._minisatcs import Solver
+            cls.Solver = Solver
+        return cls
+
+
+class MinisatCS:
+
+    def __init__(self, bootstrap_with=None, use_timer=False):
+        """
+            Basic constructor.
+        """
+
+        self.minisat = None
+        self.status = None
+
+        self.new(bootstrap_with, use_timer)
+
+    def __enter__(self):
+        """
+            'with' constructor.
+        """
+
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """
+            'with' destructor.
+        """
+
+        self.delete()
+        self.minisat = None
+
+    def new(self, bootstrap_with=None, use_timer=False):
+        """
+            Actual constructor of the solver.
+        """
+
+        if not self.minisat:
+            self.minisat = MinisatCsImporter.get().Solver()
+            # self.add_clause = self.minisat.add_clause
+
+            if bootstrap_with:
+                if type(bootstrap_with) == CNFPlus and bootstrap_with.atmosts:
+                    raise NotImplementedError('Atmost constraints are not supported by MiniSat')
+
+                for clause in bootstrap_with:
+                    self.add_clause(clause)
+
+            self.use_timer = use_timer
+            self.call_time = 0.0  # time spent for the last call to oracle
+            self.accu_time = 0.0  # time accumulated for all calls to oracle
+
+    def delete(self):
+        """
+            Destructor.
+        """
+
+        pass
+
+    def solve(self, assumptions=[]):
+        """
+            Solve internal formula.
+        """
+
+        if self.minisat:
+            if self.use_timer:
+                 start_time = process_time()
+
+            if assumptions:
+                raise NotImplementedError('Assumptions are not supported by MiniSatCS')
+
+            self.status = self.minisat.solve(None)
+
+            if self.use_timer:
+                self.call_time = process_time() - start_time
+                self.accu_time += self.call_time
+
+            return self.status
+
+    def get_status(self):
+        """
+            Returns solver's status.
+        """
+
+        if self.minisat:
+            return self.status
+
+    def get_model(self):
+        """
+            Get a model if the formula was previously satisfied.
+        """
+
+        if self.minisat and self.status == True:
+            model = self.minisat.get_model()
+            return model if model != None else []
+
+    def time(self):
+        """
+            Get time spent for the last call to oracle.
+        """
+
+        if self.minisat:
+            return self.call_time
+
+    def time_accum(self):
+        """
+            Get time accumulated for all calls to oracle.
+        """
+
+        if self.minisat:
+            return self.accu_time
+
+    def add_clause(self, clause, no_return=True):
+        """
+            Add a new clause to solver's internal formula.
+        """
+
+        if self.minisat:
+            res = self.minisat.add_clause(clause)
+
+            if res == False:
+                self.status = False
+
+            if not no_return:
+                return res
 
 
 #

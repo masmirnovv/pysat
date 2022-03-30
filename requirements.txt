@@ -1,3 +1,4 @@
+Cython>=0.29.24
 py-aiger-cnf>=2.0.0
 pypblib>=0.0.3
 six

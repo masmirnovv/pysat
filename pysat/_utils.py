@@ -32,6 +32,7 @@
 
 #
 #==============================================================================
+import contextlib
 import threading
 
 
@@ -56,3 +57,11 @@ class MainThread(object):
             res = isinstance(threading.current_thread(), threading._MainThread)
 
         return res
+
+
+@contextlib.contextmanager
+def setup_pyx_import():
+    import pyximport
+    px = pyximport.install()
+    yield
+    pyximport.uninstall(*px)

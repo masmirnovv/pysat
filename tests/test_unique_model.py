@@ -13,6 +13,7 @@ solvers = ['cadical',
            'minicard',
            'mergesat3',
            'minisat22',
+           'minisat-cs',
            'minisat-gh']
 
 def test_solvers():
