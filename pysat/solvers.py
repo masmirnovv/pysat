@@ -4837,7 +4837,6 @@ class MinisatCS:
 
         if not self.minisat:
             self.minisat = MinisatCsImporter.get().Solver()
-            # self.add_clause = self.minisat.add_clause
 
             if bootstrap_with:
                 if type(bootstrap_with) == CNFPlus and bootstrap_with.atmosts:
@@ -4866,10 +4865,7 @@ class MinisatCS:
             if self.use_timer:
                  start_time = process_time()
 
-            if assumptions:
-                raise NotImplementedError('Assumptions are not supported by MiniSatCS')
-
-            self.status = self.minisat.solve(None)
+            self.status = self.minisat.solve(assumptions, None)
 
             if self.use_timer:
                 self.call_time = process_time() - start_time

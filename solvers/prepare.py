@@ -78,7 +78,7 @@ sources = {
         'solvers/minisat22.tar.gz'
     ),
     'minisatcs': (
-        'https://github.com/jia-kai/minisatcs/archive/master.zip',
+        'https://github.com/masmirnovv/minisatcs/archive/master.zip',
         'solvers/minisatcs.zip'
     ),
     'minisatgh': (

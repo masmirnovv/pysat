@@ -15,7 +15,7 @@ cdef extern from "minisatcs_wrapper.h":
         void new_clause_commit_geq(int bound, int dst) except+
         void set_var_preference(int x, int p) except+
         void set_var_name(int x, const char*) except+
-        int solve_with_signal(bool setup, double timeout) nogil except+
+        int solve_with_signal(bool setup, const cpp_vector[int]& assumps, double timeout) nogil except+
         bool previous_timeout() except+
         cpp_vector[int] get_model() except+
         void set_recorder(MinisatClauseRecorder*) except+
@@ -76,11 +76,11 @@ cdef class Solver:
     def set_verbosity(self, level):
         self._solver.verbosity = level
 
-    def solve(self, timeout):
+    def solve(self, assumps, timeout):
         is_main = threading.current_thread() == threading.main_thread()
         if timeout is None:
             timeout = -1
-        ret = self._solver.solve_with_signal(is_main, timeout)
+        ret = self._solver.solve_with_signal(is_main, assumps, timeout)
         return [False, True, None][ret]
 
     def get_model(self):
