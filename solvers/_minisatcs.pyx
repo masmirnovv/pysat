@@ -3,6 +3,7 @@
 
 from libcpp.vector cimport vector as cpp_vector
 from libcpp cimport bool
+from libc.stdint cimport int64_t
 
 import threading
 
@@ -15,7 +16,9 @@ cdef extern from "minisatcs_wrapper.h":
         void new_clause_commit_geq(int bound, int dst) except+
         void set_var_preference(int x, int p) except+
         void set_var_name(int x, const char*) except+
-        int solve_with_signal(bool setup, const cpp_vector[int]& assumps, double timeout) nogil except+
+        void set_conf_budget(int64_t budget) except+
+        void set_prop_budget(int64_t budget) except+
+        int solve_with_signal(bool setup, const cpp_vector[int]& assumps, double timeout, bool is_limited) nogil except+
         bool previous_timeout() except+
         cpp_vector[int] get_model() except+
         void set_recorder(MinisatClauseRecorder*) except+
@@ -76,11 +79,17 @@ cdef class Solver:
     def set_verbosity(self, level):
         self._solver.verbosity = level
 
-    def solve(self, assumps, timeout):
+    def set_conf_budget(self, budget):
+        self._solver.set_conf_budget(budget)
+
+    def set_prop_budget(self, budget):
+        self._solver.set_prop_budget(budget)
+
+    def solve(self, assumps, timeout, limited):
         is_main = threading.current_thread() == threading.main_thread()
         if timeout is None:
             timeout = -1
-        ret = self._solver.solve_with_signal(is_main, assumps, timeout)
+        ret = self._solver.solve_with_signal(is_main, assumps, timeout, limited)
         return [False, True, None][ret]
 
     def get_model(self):

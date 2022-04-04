@@ -4865,13 +4865,50 @@ class MinisatCS:
             if self.use_timer:
                  start_time = process_time()
 
-            self.status = self.minisat.solve(assumptions, None)
+            self.status = self.minisat.solve(assumptions, None, False)
 
             if self.use_timer:
                 self.call_time = process_time() - start_time
                 self.accu_time += self.call_time
 
             return self.status
+
+    def solve_limited(self, assumptions=[], expect_interrupt=False):
+        """
+            Solve internal formula using given budgets for conflicts and
+            propagations.
+        """
+
+        if expect_interrupt:
+            raise NotImplementedError('expect_interrupt=True is not supported by MinisatCS')
+
+        if self.minisat:
+            if self.use_timer:
+                 start_time = process_time()
+
+            self.status = self.minisat.solve(assumptions, None, True)
+
+            if self.use_timer:
+                self.call_time = process_time() - start_time
+                self.accu_time += self.call_time
+
+            return self.status
+
+    def conf_budget(self, budget):
+        """
+            Set limit on the number of conflicts.
+        """
+
+        if self.minisat:
+            self.minisat.set_conf_budget(budget)
+
+    def prop_budget(self, budget):
+        """
+            Set limit on the number of propagations.
+        """
+
+        if self.minisat:
+            self.minisat.set_prop_budget(budget)
 
     def get_status(self):
         """
