@@ -92,7 +92,9 @@ class build(distutils.command.build.build):
         """
         # download and compile solvers
         if platform.system() != 'Windows':
+            to_install.remove('minisatcs')
             prepare.do(to_install)
+            prepare.do(['minisatcs'])
 
         # now, do standard build
         distutils.command.build.build.run(self)
@@ -110,7 +112,9 @@ class build_ext(distutils.command.build_ext.build_ext):
         """
         # download and compile solvers
         if platform.system() != 'Windows':
+            to_install.remove('minisatcs')
             prepare.do(to_install)
+            prepare.do(['minisatcs'])
 
         # now, do standard build
         distutils.command.build_ext.build_ext.run(self)
